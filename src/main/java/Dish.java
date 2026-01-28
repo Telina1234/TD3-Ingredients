@@ -1,45 +1,28 @@
-// java
 import java.util.List;
 import java.util.Objects;
 
 public class Dish {
+
     private Integer id;
     private Double price;
     private String name;
     private DishTypeEnum dishType;
     private List<DishIngredient> ingredients;
 
-
-    public Double getPrice() {
-        return price;
-    }
-
-    public void setPrice(Double price) {
-        this.price = price;
-    }
-
-    public Double getDishCost() {
-        double total = 0;
-
-        if (ingredients == null) return 0.0;
-
-        for (DishIngredient di : ingredients) {
-            total += di.getIngredient().getPrice() * di.getQuantityRequired();
-        }
-
-        return total;
-    }
+    // ================= CONSTRUCTORS =================
 
     public Dish() {
     }
 
-    public Dish(Integer id, String name, DishTypeEnum dishType, List<DishIngredient> ingredients) {
+    public Dish(Integer id, String name, DishTypeEnum dishType,
+                List<DishIngredient> ingredients) {
         this.id = id;
         this.name = name;
         this.dishType = dishType;
         this.ingredients = ingredients;
     }
 
+    // ================= GETTERS / SETTERS =================
 
     public Integer getId() {
         return id;
@@ -47,6 +30,14 @@ public class Dish {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
     }
 
     public String getName() {
@@ -70,29 +61,42 @@ public class Dish {
     }
 
     public void setIngredients(List<DishIngredient> ingredients) {
-        if (ingredients == null) {
-            this.ingredients = null;
-            return;
-        }
-        for (DishIngredient di : ingredients) {
-            if (di != null && di.getIngredient() != null) {
-                di.getIngredient().setDish(this);
-                di.getIngredient().setQuantity(di.getQuantityRequired());
-            }
-        }
         this.ingredients = ingredients;
     }
 
+    // ================= BUSINESS LOGIC =================
+
+    public Double getDishCost() {
+        if (ingredients == null || ingredients.isEmpty()) {
+            return 0.0;
+        }
+
+        double total = 0.0;
+        for (DishIngredient di : ingredients) {
+            total += di.getIngredient().getPrice() * di.getQuantityRequired();
+        }
+        return total;
+    }
+
+    public Double getGrossMargin() {
+        if (price == null) {
+            throw new RuntimeException("Dish price is null");
+        }
+        return price - getDishCost();
+    }
+
+    // ================= OVERRIDES =================
+
     @Override
     public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        Dish dish = (Dish) o;
-        return Objects.equals(id, dish.id) && Objects.equals(name, dish.name) && dishType == dish.dishType && Objects.equals(ingredients, dish.ingredients);
+        if (this == o) return true;
+        if (!(o instanceof Dish dish)) return false;
+        return Objects.equals(id, dish.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, dishType, ingredients);
+        return Objects.hash(id);
     }
 
     @Override
@@ -104,12 +108,5 @@ public class Dish {
                 ", dishType=" + dishType +
                 ", ingredients=" + ingredients +
                 '}';
-    }
-
-    public Double getGrossMargin() {
-        if (price == null) {
-            throw new RuntimeException("Price is null");
-        }
-        return price - getDishCost();
     }
 }

@@ -1,4 +1,7 @@
 import java.util.Objects;
+import java.time.Instant;
+import java.util.List;
+
 
 public class Ingredient {
     private Integer id;
@@ -7,6 +10,8 @@ public class Ingredient {
     private Double price;
     private Dish dish;
     private Double quantity;
+    private List<StockMovement> stockMovementList;
+
 
     public Double getQuantity() {
         return quantity;
@@ -97,4 +102,20 @@ public class Ingredient {
                 ", quantity=" + quantity +
                 '}';
     }
+
+    public StockValue getStockValueAt(Instant t) {
+        double stock = 0;
+
+        for (StockMovement sm : stockMovementList) {
+            if (!sm.getCreationDatetime().isAfter(t)) {
+                if (sm.getType() == MovementTypeEnum.IN) {
+                    stock += sm.getValue().getQuantity();
+                } else {
+                    stock -= sm.getValue().getQuantity();
+                }
+            }
+        }
+        return new StockValue(stock, "KG");
+    }
+
 }
