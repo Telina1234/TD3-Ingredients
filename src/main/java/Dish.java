@@ -1,3 +1,4 @@
+// java
 import java.util.List;
 import java.util.Objects;
 
@@ -20,6 +21,8 @@ public class Dish {
     public Double getDishCost() {
         double total = 0;
 
+        if (ingredients == null) return 0.0;
+
         for (DishIngredient di : ingredients) {
             total += di.getIngredient().getPrice() * di.getQuantityRequired();
         }
@@ -30,7 +33,7 @@ public class Dish {
     public Dish() {
     }
 
-    public Dish(Integer id, String name, DishTypeEnum dishType, List<Ingredient> ingredients) {
+    public Dish(Integer id, String name, DishTypeEnum dishType, List<DishIngredient> ingredients) {
         this.id = id;
         this.name = name;
         this.dishType = dishType;
@@ -62,17 +65,20 @@ public class Dish {
         this.dishType = dishType;
     }
 
-    public List<Ingredient> getIngredients() {
+    public List<DishIngredient> getIngredients() {
         return ingredients;
     }
 
-    public void setIngredients(List<Ingredient> ingredients) {
+    public void setIngredients(List<DishIngredient> ingredients) {
         if (ingredients == null) {
             this.ingredients = null;
             return;
         }
-        for (int i = 0; i < ingredients.size(); i++) {
-            ingredients.get(i).setDish(this);
+        for (DishIngredient di : ingredients) {
+            if (di != null && di.getIngredient() != null) {
+                di.getIngredient().setDish(this);
+                di.getIngredient().setQuantity(di.getQuantityRequired());
+            }
         }
         this.ingredients = ingredients;
     }
@@ -106,4 +112,4 @@ public class Dish {
         }
         return price - getDishCost();
     }
-
+}

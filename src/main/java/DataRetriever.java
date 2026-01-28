@@ -1,3 +1,4 @@
+// java
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -65,7 +66,18 @@ public class DataRetriever {
                 }
             }
 
-            List<Ingredient> newIngredients = toSave.getIngredients();
+            List<DishIngredient> newDishIngredients = toSave.getIngredients();
+            List<Ingredient> newIngredients = new ArrayList<>();
+            if (newDishIngredients != null) {
+                for (DishIngredient di : newDishIngredients) {
+                    if (di != null && di.getIngredient() != null) {
+                        // ensure ingredient has quantity set from DishIngredient
+                        di.getIngredient().setQuantity(di.getQuantityRequired());
+                        newIngredients.add(di.getIngredient());
+                    }
+                }
+            }
+
             detachIngredients(conn, dishId, newIngredients);
             attachIngredients(conn, dishId, newIngredients);
 
